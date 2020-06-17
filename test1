@@ -1,0 +1,39 @@
+<el-table border id="table1" :data="data1" width="1000px">
+        <el-table-column  prop="netno" label="netNo" width="50px">
+
+        </el-table-column>
+        <el-table-column  prop="briefname" label="briefName" width="50px">
+
+        </el-table-column>
+        <el-table-column  prop="plaintiffname" label="plaintiffName" width="50px">
+
+        </el-table-column>
+        <el-table-column  prop="defendantname" label="defendantName" width="50px">
+
+        </el-table-column>
+        <el-table-column  prop="courtname" label="courtName" width="50px">
+
+        </el-table-column>
+
+      </el-table><br>
+
+
+      axios.get('../../static/test.txt')
+                  .then(res=>{
+                  console.log(res.data)
+                    if (res.data.state===100){
+                      pageTotal:res.data.data.totalPages
+                      pageNum:res.data.data.pageNumber
+                      pageSize:res.data.data.pageSize
+                      let listLen:res.data.data.lawCaseList.length
+                      for (let i=0;i<listLen;i++){
+                      data1:[{
+                        netno:res.data.data.lawCaseList[i].netApplicationNo
+                        briefname:res.data.data.lawCaseList[i].briefName
+                        plaintiffname:res.data.data.lawCaseList[i].plaintiffName
+                        defendantname:res.data.data.lawCaseList[i].defendantName
+                        courtname:res.data.data.lawCaseList[i].courtName
+                      }]
+
+                    }
+                })
