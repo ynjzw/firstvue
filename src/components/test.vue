@@ -60,19 +60,12 @@ import axios from 'axios'
               },
 
             ],
-            data1:[{
-              netno:'',
-              briefname:'',
-              plaintiffname:'',
-              defendantname:'',
-              courtname:''
-            }
-            ]
+            data1:[            ]
           }
 
         },
     mounted() {
-          axios.get('../../static/test.txt')
+          axios.get('')
             .then(res=>{
             console.log(res.data)
               if (res.data.state===100){
