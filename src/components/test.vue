@@ -1,13 +1,13 @@
 <template>
   <div id="app">
     <div id="select">
-      <span id="net">
-        <label>net:</label>
-        <input type="text"></input>
-      </span>
-      <span id="brief">
-        <label>brief:</label>
-        <input type="text"></input>
+
+      <span >
+        <label>process:</label>
+        <select v-model="process">
+          <option v-for="item in proList" :value="item.value" :key="item.value">{{item.label}}</option>
+        </select>
+
       </span>
       <span>
         <button :click="search">search</button>
@@ -15,7 +15,7 @@
     </div><br>
     <div id="table">
       <Table border id="table1" :data="data1" :columns="column1"></Table>
-      <page :total="pageTotal" :current="pageNum" :page-size="pageSize" show-elevator show-sizer show-total
+      <Page :total="pageTotal" :current="pageNum" :page-size="pageSize"  show-elevator show-sizer show-total
             placement="top" @on-change="handlePage" @on-page-size-change='handlePageSize'>
 
       </Page>
@@ -35,55 +35,99 @@ import axios from 'axios'
             loading:true,
             border:true,
             pageTotal: null,
-            pageNum: null,
-            pageSize: null,
+            pageNum:null,
+            pageSize:null,
+            process:'',
+            proList:[
+                {
+                  value:'立案申请',
+                  label:'立案申请'
+                },
+                {
+                  value:'立案',
+                  label:'立案'
+                },
+                {
+                  value:'待开庭',
+                  label:'待开庭'
+                },
+                {
+                  value:'排班',
+                  label:'排班'
+                },
+                {
+                  value:'已开庭',
+                  label:'已开庭'
+                },
+              ],
+
             column1:[
               {
-                title:'netNo',//网申号
-                key:'netno'
+                title:'网申号',//网申号
+                key:'netApplicationNo'
               },
               {
-                title: 'briefName',//案由
-                key: 'briefname'
+                title: 'progress',//progress
+                key: 'progress'
               },
               {
-                title: 'plaintiffName',//原告
-                key: 'plaintiffname'
+                title: 'lawCaseId',//lawCaseId
+                key: 'lawCaseId'
               },
               {
-                title: 'defendantName',//被告
-                key: 'defendantname'
+                title: '法庭',//法庭
+                key: 'courtName'
               },
               {
-                title: 'courtName',//法庭
-                key: 'courtname'
-              },
+                title: 'action',
+                key: 'acion',
+                render:(h,param)=>{
+                  return h('div',[
+                    h('button',{
+                      props:{
+                        type:'text',
+                        size:'small'
+                      },
+                      on:{
+                        click:()=> {
+                          this.show(param.index)
+                        }
+                      }
+                    },'view'),
+                    h('button',{
+                      props:{
+                        type:'text',
+                        size:'small'
+                      },
+                      on:{
+                        click:()=>{
+                          this.remove(param.index)
+                        }
+                      }
+                    },'delete')
+                  ])
+                }
+              }
 
             ],
-            data1:[            ]
+            data1:[],
+            params:{
+              judgeId:'',
+              progress:'',
+              caseNo:'',
+              startTime:'',
+              endTime:'',
+            }
+
           }
 
         },
     mounted() {
-          axios.get('')
-            .then(res=>{
+          getInfo(this.params).then(res=>{
             console.log(res.data)
               if (res.data.state===100){
                 this.pageTotal=res.data.data.totalPages
-                this.pageNum=res.data.data.pageNumber
-                this.pageSize=res.data.data.pageSize
-                let listLen=res.data.data.lawCaseList.length
-
-                for (let i=0;i<listLen;i++){
-                  this.data1=[
-                    {
-                    netno:res.data.data.lawCaseList[i].netApplicationNo,
-                    briefname:res.data.data.lawCaseList[i].briefName,
-                    plaintiffname:res.data.data.lawCaseList[i].plaintiffName,
-                    defendantname:res.data.data.lawCaseList[i].defendantName,
-                    courtname:res.data.data.lawCaseList[i].courtName,
-                  }]
-                }
+                this.data1=res.data.data.content
 
               }
           })
@@ -95,7 +139,24 @@ import axios from 'axios'
       handlePageSize(value) {
         this.pageSize = value
       },
-      search(data){
+      search(){
+        if (this.process!==''){
+          this.params.progress=this.process
+          axios.get('/api/court/index/indexCourtLawCaseList.jhtml',{params:this.params}).then(res=>{
+              console.log(res.data)
+            if (res.data.state===100){
+              this.data1=res.data.data.content
+            }
+          }
+
+          )
+        }
+
+      },
+      show(data){
+
+      },
+      remove(data){
 
       }
     }
@@ -105,12 +166,12 @@ import axios from 'axios'
 <style scoped>
   #app{
     width: 1000px;
-    height: 600px;
+    height: 800px;
     top: 50%;
     bottom: 50%;
     right: 50%;
     left: 50%;
-    transform: translate(-50%,-70%);
+    transform: translate(-50%,-50%);
     position: absolute;
     text-align: center;
     display: table-cell;
