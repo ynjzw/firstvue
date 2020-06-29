@@ -38,27 +38,23 @@ import axios from 'axios'
             pageNum:null,
             pageSize:null,
             process:'',
+            dialogVisible:false,
+            item:[],
+            jurorData:{
+              name:'',
+              address:'',
+              profession:''
+            },
+
             proList:[
                 {
-                  value:'立案申请',
-                  label:'立案申请'
+                  value:'厦门',
+                  label:'厦门'
                 },
                 {
-                  value:'立案',
-                  label:'立案'
-                },
-                {
-                  value:'待开庭',
-                  label:'待开庭'
-                },
-                {
-                  value:'排班',
-                  label:'排班'
-                },
-                {
-                  value:'已开庭',
-                  label:'已开庭'
-                },
+                  value:'泉州',
+                  label:'泉州'
+                }
               ],
 
             column1:[
@@ -67,16 +63,16 @@ import axios from 'axios'
                 key:'netApplicationNo'
               },
               {
-                title: 'progress',//progress
-                key: 'progress'
+                title: 'address',//progress
+                key: 'address'
               },
               {
-                title: 'lawCaseId',//lawCaseId
-                key: 'lawCaseId'
+                title: 'idcard',//lawCaseId
+                key: 'idcard'
               },
               {
-                title: '法庭',//法庭
-                key: 'courtName'
+                title: 'name',//法庭
+                key: 'name'
               },
               {
                 title: 'action',
@@ -101,10 +97,21 @@ import axios from 'axios'
                       },
                       on:{
                         click:()=>{
-                          this.remove(param.index)
+                          this.edit(param.index)
                         }
                       }
-                    },'delete')
+                    },'edit'),
+                  h('button',{
+                    props:{
+                      type:'text',
+                      size:'small'
+                    },
+                    on:{
+                      click:()=>{
+                        this.remove(param.index)
+                      }
+                    }
+                  },'delete')
                   ])
                 }
               }
@@ -123,11 +130,10 @@ import axios from 'axios'
 
         },
     mounted() {
-          getInfo(this.params).then(res=>{
+          getInfo().then(res=>{
             console.log(res.data)
               if (res.data.state===100){
-                this.pageTotal=res.data.data.totalPages
-                this.data1=res.data.data.content
+                this.data1=res.data.data
 
               }
           })
@@ -141,11 +147,16 @@ import axios from 'axios'
       },
       search(){
         if (this.process!==''){
-          this.params.progress=this.process
-          axios.get('/api/court/index/indexCourtLawCaseList.jhtml',{params:this.params}).then(res=>{
+          getInfo().then(res=>{
               console.log(res.data)
             if (res.data.state===100){
-              this.data1=res.data.data.content
+              for (this.item in res.data.data){
+                if (this.item.address === this.process){
+                  this.data1=this.item
+                }
+
+              }
+
             }
           }
 
@@ -154,6 +165,14 @@ import axios from 'axios'
 
       },
       show(data){
+        render:(h)=>{
+          h(
+            
+          )
+        }
+
+      },
+      edit(data){
 
       },
       remove(data){
@@ -171,7 +190,7 @@ import axios from 'axios'
     bottom: 50%;
     right: 50%;
     left: 50%;
-    transform: translate(-50%,-50%);
+    transform: translate(-50%,-30%);
     position: absolute;
     text-align: center;
     display: table-cell;
