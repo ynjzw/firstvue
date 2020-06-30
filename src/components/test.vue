@@ -10,8 +10,9 @@
 
       </span>
       <span>
-        <button :click="search">search</button>
+        <button @click="search">search</button>
       </span>
+
     </div><br>
     <div id="table">
       <Table border id="table1" :data="data1" :columns="column1"></Table>
@@ -28,8 +29,15 @@
 
 <script>
   import {getInfo} from "../api/test";
-import axios from 'axios'
+  import show from './show';
+  import remove from './remove';
+  import edit from './edit'
   export default {
+    components:{
+      show,
+      remove,
+      edit
+    },
         data:function() {
           return{
             loading:true,
@@ -86,7 +94,7 @@ import axios from 'axios'
                       },
                       on:{
                         click:()=> {
-                          this.show(param.index)
+                          show(param.index)
                         }
                       }
                     },'view'),
@@ -108,7 +116,7 @@ import axios from 'axios'
                     },
                     on:{
                       click:()=>{
-                        this.remove(param.index)
+                        remove(param.index)
                       }
                     }
                   },'delete')
@@ -150,34 +158,25 @@ import axios from 'axios'
           getInfo().then(res=>{
               console.log(res.data)
             if (res.data.state===100){
-              for (this.item in res.data.data){
-                if (this.item.address === this.process){
-                  this.data1=this.item
+              let list = res.data.data
+              this.data1 = []
+              list.map(it=>{
+                if(it.address === this.process){
+                  this.data1=[it]
                 }
-
-              }
+              })
+              console.log(this.data1,'当前数据')
 
             }
           }
 
           )
+        }else{
+          this.$Message.info('没有选择')
         }
 
       },
-      show(data){
-        render:(h)=>{
-          h(
-            
-          )
-        }
 
-      },
-      edit(data){
-
-      },
-      remove(data){
-
-      }
     }
   }
 </script>
